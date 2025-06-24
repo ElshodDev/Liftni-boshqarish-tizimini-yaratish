@@ -1,0 +1,6 @@
+@Liftni_boshqarish_tizimini_yaratish.Api_HostAddress = http://localhost:5012
+
+GET {{Liftni_boshqarish_tizimini_yaratish.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
