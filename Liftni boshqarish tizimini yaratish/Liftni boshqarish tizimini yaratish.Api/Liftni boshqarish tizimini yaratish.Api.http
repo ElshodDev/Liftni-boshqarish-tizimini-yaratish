@@ -1,6 +1,29 @@
-@Liftni_boshqarish_tizimini_yaratish.Api_HostAddress = http://localhost:5012
+@rootURl = http://localhost:5012
 
-GET {{Liftni_boshqarish_tizimini_yaratish.Api_HostAddress}}/weatherforecast/
+GET {{rootURl}}/weatherforecast/
 Accept: application/json
 
 ###
+Get {{rootURL}}/api/elevator/status
+Accept: application/json
+
+###
+POST {{rootUrl}}/api/elevator/requests
+Content-Type: application/json
+
+{
+  "Id": 1,
+  "requestedFloor": 6,
+  "requestedAt": " 2025-06-24 T 17:33:10 ",
+  "isProcessed": false
+}
+
+###
+PUT {{rootURL}}/api/elevator/requests/5
+Content-Type:application/json
+{
+   "id": 1,
+   "requestedFloor": 6,
+   "requestedAt":"2025-07-24T17:33:10",
+   "isProcessed": true
+}
