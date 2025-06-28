@@ -1,0 +1,26 @@
+# 1. BASE IMAGE
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
+
+# 2. BUILD IMAGE
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY ["Liftni boshqarish tizimini yaratish.Api/Liftni boshqarish tizimini yaratish.Api.csproj", "Liftni boshqarish tizimini yaratish.Api/"]
+RUN dotnet restore "Liftni boshqarish tizimini yaratish.Api/Liftni boshqarish tizimini yaratish.Api.csproj"
+COPY . .
+WORKDIR "/src/Liftni boshqarish tizimini yaratish.Api"
+RUN dotnet build "Liftni boshqarish tizimini yaratish.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# 3. PUBLISH IMAGE
+FROM build AS publish
+ARG BUILD_CONFIGURATION=Release
+RUN dotnet publish "Liftni boshqarish tizimini yaratish.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+# 4. FINAL IMAGE
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "Liftni boshqarish tizimini yaratish.Api.dll"]

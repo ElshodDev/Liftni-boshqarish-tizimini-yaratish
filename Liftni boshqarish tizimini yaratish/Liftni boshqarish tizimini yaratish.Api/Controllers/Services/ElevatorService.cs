@@ -47,9 +47,39 @@ namespace Liftni_boshqarish_tizimini_yaratish.Api.Controllers.Services
             {
                 Console.WriteLine("Xato: " + ex.InnerException?.Message);
             }
+               _ = Task.Run(ProcessNextRequestAsync);
 
             return $"Lift {requestedFloor}-qavatga chaqirildi.";
         }
+        public async Task ProcessNextRequestAsync()
+        {
+            var elevator = GetCurrentStatus();
+            if (elevator.IsBusy) return;
+
+            // Keyingi qayta ishlanmagan so‘rovni olamiz
+            var nextRequest = _context.FloorRequests
+                .Where(fr => !fr.IsProcessed)
+                .OrderBy(fr => fr.RequestedAt)
+                .FirstOrDefault();
+
+            if (nextRequest != null)
+            {
+                elevator.IsBusy = true;
+                elevator.Direction = nextRequest.RequestedFloor > elevator.CurrentFloor ? "up" : "down";
+                await _context.SaveChangesAsync();
+
+                // Harakatni simulyatsiya qilish uchun sun'iy kechikish (masalan: 3s delay)
+                await Task.Delay(3000);
+
+                elevator.CurrentFloor = nextRequest.RequestedFloor;
+                elevator.IsBusy = false;
+                elevator.Direction = "idle";
+                nextRequest.IsProcessed = true;
+
+                await _context.SaveChangesAsync();
+            }
+        }
+
 
         // CRUD metodlar:
         public async Task<FloorRequest?> GetRequestByIdAsync(int id)
